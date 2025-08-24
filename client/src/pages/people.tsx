@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import VillageCard from "@/components/ui/village-card";
 import { Search, Users, Filter, User, Instagram, Facebook } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
-import { ARCHETYPE_OPTIONS } from "../../../shared/types";
+import { ARCHETYPE_OPTIONS } from "@shared/types";
 
 export default function People() {
   const [location] = useLocation();
@@ -52,7 +52,7 @@ export default function People() {
     });
 
   const archetypeStats = ARCHETYPE_OPTIONS.reduce((acc: any, archetype) => {
-    acc[archetype] = users.filter((user: any) => user.archetype === archetype).length;
+    acc[archetype.id] = users.filter((user: any) => user.archetype === archetype.id).length;
     return acc;
   }, {});
 
@@ -130,13 +130,13 @@ export default function People() {
           <CardContent>
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
               {ARCHETYPE_OPTIONS.map((archetype) => (
-                <div key={archetype} className="text-center p-4 rounded-lg bg-space/50" data-testid={`archetype-stat-${archetype.toLowerCase().replace(' ', '-')}`}>
-                  <div className="text-sm text-gray-400 mb-1">{archetype}</div>
+                <div key={archetype.id} className="text-center p-4 rounded-lg bg-space/50" data-testid={`archetype-stat-${archetype.id}`}> 
+                  <div className="text-sm text-gray-400 mb-1">{archetype.label}</div>
                   <div className="text-lg font-bold text-electric-green">
-                    {archetypeStats[archetype] || 0}
+                    {archetypeStats[archetype.id] || 0}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {users.length > 0 ? Math.round((archetypeStats[archetype] || 0) / users.length * 100) : 0}%
+                    {users.length > 0 ? Math.round((archetypeStats[archetype.id] || 0) / users.length * 100) : 0}%
                   </div>
                 </div>
               ))}
@@ -166,8 +166,8 @@ export default function People() {
                 <SelectContent className="bg-void border-purple-deep">
                   <SelectItem value="all">All Archetypes</SelectItem>
                   {ARCHETYPE_OPTIONS.map((archetype) => (
-                    <SelectItem key={archetype} value={archetype}>
-                      {archetype} ({archetypeStats[archetype] || 0})
+                    <SelectItem key={archetype.id} value={archetype.id}>
+                      {archetype.label} ({archetypeStats[archetype.id] || 0})
                     </SelectItem>
                   ))}
                 </SelectContent>
