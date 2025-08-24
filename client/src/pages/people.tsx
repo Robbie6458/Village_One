@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import VillageCard from "@/components/ui/village-card";
 import { Search, Users, Filter, User, Instagram, Facebook } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
-import { ARCHETYPE_OPTIONS } from "@shared/types";
+import { ARCHETYPE_OPTIONS } from "../../../shared/types";
 
 export default function People() {
   const [location] = useLocation();

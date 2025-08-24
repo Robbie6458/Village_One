@@ -13,8 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Save, Send, Edit3, Eye } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { FORUM_SECTIONS } from "@shared/types";
-import type { Post } from "@shared/types";
+import { FORUM_SECTIONS } from "../../../../shared/types";
+import type { Post } from "../../../../shared/types";
 
 // Form validation schema
 const postFormSchema = z.object({

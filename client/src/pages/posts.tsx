@@ -8,8 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Edit, Calendar, MessageSquare, ThumbsUp, Eye } from "lucide-react";
 import { PostEditor } from "@/components/forms/post-editor";
-import { FORUM_SECTIONS } from "@shared/types";
-import type { Post } from "@shared/types";
+import { FORUM_SECTIONS } from "../../../shared/types";
+import type { Post } from "../../../shared/types";
 
 export default function PostsPage() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);

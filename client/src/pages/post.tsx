@@ -12,7 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import PostContent from "@/components/ui/post-content";
 import { ArrowLeft, MessageCircle, ArrowUp, ArrowDown, Calendar, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { Post, User as UserType, Comment } from "@shared/types";
+import type { Post, User as UserType, Comment } from "../../../shared/types";
 
 interface PostWithAuthor extends Post {
   author: UserType;
