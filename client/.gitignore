@@ -1,0 +1,67 @@
+# --- Node / package managers ---
+node_modules/
+**/node_modules/
+*.tsbuildinfo
+
+# --- Build output & caches ---
+dist/
+build/
+out/
+.vite/
+**/.vite/
+.next/
+.svelte-kit/
+.storybook-out/
+coverage/
+
+# --- Logs ---
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+debug.log
+
+# --- Env & secrets ---
+.env
+.env.*
+!.env.example
+*.local
+*.secret
+
+# --- Databases / local data (adjust as needed) ---
+*.sqlite
+*.db
+*.db-journal
+tmp/
+temp/
+
+# --- Editors / OS junk ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+Icon?
+Desktop.ini
+
+# --- Replit artifacts (no longer needed) ---
+.replit
+replit.nix
+
+# --- Drizzle ORM ---
+# Keep migrations tracked (drizzle/), but ignore local DBs if you generate any here.
+drizzle/*.sqlite
+drizzle/*.db
+drizzle/*.db-journal
+
+# --- Supabase (if present) ---
+.supabase
+supabase/.branches
+supabase/.temp
+
+# --- If you still keep a subapp in `client/`, ignore its outputs too ---
+client/dist/
+client/out/
+client/.vite/
+client/node_modules/
+client/.next/
