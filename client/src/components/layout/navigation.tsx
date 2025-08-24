@@ -39,7 +39,7 @@ const FORUM_SECTIONS = [
 export default function Navigation() {
   const [location] = useLocation();
   const [chatOpen, setChatOpen] = useState(false);
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth() as { user: { id: string; username?: string; email?: string; archetype?: string; level?: number; contributions?: number; profileImageUrl?: string } | null, isLoading: boolean, isAuthenticated: boolean };
 
   const currentUser = isAuthenticated && user ? {
     name: (user as any).username || (user as any).email?.split('@')[0] || 'User',
