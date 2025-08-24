@@ -222,7 +222,7 @@ export default function Navigation() {
               data-testid="button-login"
             >
               <LogIn size={16} />
-              <span>Login with Replit</span>
+              <span>Login</span>
             </Button>
           )}
           
