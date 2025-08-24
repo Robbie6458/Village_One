@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(240, 15%, 4%);
+  --foreground: hsl(0, 0%, 100%);
+  --card: hsl(240, 14%, 10%);
+  --card-foreground: hsl(0, 0%, 100%);
+  --popover: hsl(240, 14%, 10%);
+  --popover-foreground: hsl(0, 0%, 100%);
+  --primary: hsl(180, 100%, 50%);
+  --primary-foreground: hsl(240, 15%, 4%);
+  --secondary: hsl(240, 15%, 6%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(240, 14%, 10%);
+  --muted-foreground: hsl(0, 0%, 70%);
+  --accent: hsl(240, 14%, 15%);
+  --accent-foreground: hsl(180, 100%, 50%);
+  --destructive: hsl(0, 62%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(240, 12%, 15%);
+  --input: hsl(240, 14%, 10%);
+  --ring: hsl(180, 100%, 50%);
+  
+  /* Village-One Custom Colors */
+  --space: hsl(240, 15%, 4%);
+  --void: hsl(240, 14%, 10%);
+  --purple-deep: hsl(260, 60%, 25%);
+  --neon-cyan: hsl(180, 100%, 50%);
+  --electric-green: hsl(120, 100%, 42%);
+  --holo-gold: hsl(51, 100%, 50%);
+  --earth-green: hsl(120, 61%, 34%);
+  --earth-brown: hsl(25, 75%, 31%);
+  
+  /* Fonts */
+  --font-cyber: 'Orbitron', monospace;
+  --font-organic: 'Nunito', sans-serif;
+  --font-sans: var(--font-organic);
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: hsl(240, 15%, 4%);
+  --foreground: hsl(0, 0%, 100%);
+  --card: hsl(240, 14%, 10%);
+  --card-foreground: hsl(0, 0%, 100%);
+  --popover: hsl(240, 14%, 10%);
+  --popover-foreground: hsl(0, 0%, 100%);
+  --primary: hsl(180, 100%, 50%);
+  --primary-foreground: hsl(240, 15%, 4%);
+  --secondary: hsl(240, 15%, 6%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(240, 14%, 10%);
+  --muted-foreground: hsl(0, 0%, 70%);
+  --accent: hsl(240, 14%, 15%);
+  --accent-foreground: hsl(180, 100%, 50%);
+  --destructive: hsl(0, 62%, 50%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(240, 12%, 15%);
+  --input: hsl(240, 14%, 10%);
+  --ring: hsl(180, 100%, 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--font-organic);
+  }
+}
+
+@layer components {
+  /* Custom animations */
+  @keyframes pulse-neon {
+    0%, 100% { box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan), 0 0 15px var(--neon-cyan); }
+    50% { box-shadow: 0 0 2px var(--neon-cyan), 0 0 5px var(--neon-cyan), 0 0 8px var(--neon-cyan); }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes glow {
+    from { text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan); }
+    to { text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan), 0 0 15px var(--neon-cyan); }
+  }
+  
+  @keyframes holographic {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  @keyframes subtle-jiggle {
+    0%, 90%, 100% { transform: translateX(0) translateY(0); }
+    92% { transform: translateX(1px) translateY(-1px); }
+    94% { transform: translateX(-1px) translateY(1px); }
+    96% { transform: translateX(1px) translateY(0); }
+    98% { transform: translateX(0) translateY(-1px); }
+  }
+  
+  .animate-subtle-jiggle {
+    animation: subtle-jiggle 8s ease-in-out infinite;
+  }
+
+  /* Custom utility classes */
+  .font-cyber {
+    font-family: var(--font-cyber);
+  }
+  
+  .font-organic {
+    font-family: var(--font-organic);
+  }
+  
+  .animate-pulse-neon {
+    animation: pulse-neon 2s infinite;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  .holographic {
+    background: linear-gradient(45deg, hsl(180, 100%, 50%), hsl(120, 100%, 42%), hsl(51, 100%, 50%), hsl(320, 100%, 70%));
+    background-size: 400% 400%;
+    animation: holographic 4s ease-in-out infinite;
+  }
+  
+  .texture-organic {
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsla(120, 100%, 42%, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsla(180, 100%, 50%, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, hsla(51, 100%, 50%, 0.1) 0%, transparent 50%);
+  }
+  
+  /* Card rarities */
+  .card-rare {
+    border: 2px solid hsl(51, 100%, 50%);
+    box-shadow: 0 0 20px hsla(51, 100%, 50%, 0.3);
+  }
+  
+  .card-epic {
+    border: 2px solid hsl(260, 60%, 60%);
+    box-shadow: 0 0 20px hsla(260, 60%, 60%, 0.3);
+  }
+  
+  .card-legendary {
+    border: 2px solid hsl(15, 100%, 60%);
+    box-shadow: 0 0 20px hsla(15, 100%, 60%, 0.3);
+  }
+  
+  /* Navigation */
+  .nav-item:hover {
+    background: linear-gradient(90deg, hsla(180, 100%, 50%, 0.1), hsla(120, 100%, 42%, 0.1));
+    border-left: 3px solid hsl(180, 100%, 50%);
+  }
+  
+  /* Contribution progress bar */
+  .contribution-bar {
+    background: linear-gradient(90deg, hsl(120, 100%, 42%) 0%, hsl(180, 100%, 50%) 50%, hsl(51, 100%, 50%) 100%);
+    height: 4px;
+    border-radius: 2px;
+  }
+
+  /* Custom colors */
+  .text-space { color: hsl(240, 15%, 4%); }
+  .text-void { color: hsl(240, 14%, 10%); }
+  .text-purple-deep { color: hsl(260, 60%, 25%); }
+  .text-neon-cyan { color: hsl(180, 100%, 50%); }
+  .text-electric-green { color: hsl(120, 100%, 42%); }
+  .text-holo-gold { color: hsl(51, 100%, 50%); }
+  .text-earth-green { color: hsl(120, 61%, 34%); }
+  .text-earth-brown { color: hsl(25, 75%, 31%); }
+  
+  .bg-space { background-color: hsl(240, 15%, 4%); }
+  .bg-void { background-color: hsl(240, 14%, 10%); }
+  .bg-purple-deep { background-color: hsl(260, 60%, 25%); }
+  .bg-neon-cyan { background-color: hsl(180, 100%, 50%); }
+  .bg-electric-green { background-color: hsl(120, 100%, 42%); }
+  .bg-holo-gold { background-color: hsl(51, 100%, 50%); }
+  .bg-earth-green { background-color: hsl(120, 61%, 34%); }
+  .bg-earth-brown { background-color: hsl(25, 75%, 31%); }
+  
+  .border-space { border-color: hsl(240, 15%, 4%); }
+  .border-void { border-color: hsl(240, 14%, 10%); }
+  .border-purple-deep { border-color: hsl(260, 60%, 25%); }
+  .border-neon-cyan { border-color: hsl(180, 100%, 50%); }
+  .border-electric-green { border-color: hsl(120, 100%, 42%); }
+  .border-holo-gold { border-color: hsl(51, 100%, 50%); }
+  .border-earth-green { border-color: hsl(120, 61%, 34%); }
+  .border-earth-brown { border-color: hsl(25, 75%, 31%); }
+}
