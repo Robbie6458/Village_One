@@ -63,68 +63,67 @@ export default function Navigation() {
         
         {/* User Profile Card */}
         <div className="card-rare rounded-lg p-4 mb-6 bg-gradient-to-br from-void to-purple-deep">
-          {isAuthenticated ? (
+          {currentUser ? (
             <>
-              <Link href={`/profile/${(user as any)?.id || 'me'}`}>
+              <Link href={`/profile/${user?.id || 'me'}`}>
                 <div className="cursor-pointer hover:scale-105 transition-transform duration-300" data-testid="nav-profile-card">
                   <div className="flex items-center space-x-3 mb-2">
                     <img 
-                      src={currentUser.avatar} 
+                      src={currentUser?.avatar} 
                       alt="User Avatar" 
                       className="w-12 h-12 rounded-full border-2 border-holo-gold"
                       data-testid="img-avatar"
                     />
                     <div>
-                      <h3 className="font-semibold text-holo-gold" data-testid="text-username">{currentUser.name}</h3>
-                      <p className="text-xs text-neon-cyan" data-testid="text-archetype">{currentUser.archetype}</p>
+                      <h3 className="font-semibold text-holo-gold" data-testid="text-username">{currentUser?.name}</h3>
+                      <p className="text-xs text-neon-cyan" data-testid="text-archetype">{currentUser?.archetype}</p>
                     </div>
                   </div>
                   <div className="text-xs space-y-1">
                     <div className="flex justify-between">
                       <span>Level</span>
-                      <span className="text-electric-green" data-testid="text-level">{currentUser.level}</span>
+                      <span className="text-electric-green" data-testid="text-level">{currentUser?.level}</span>
                     </div>
                     <div className="w-full bg-void rounded-full h-1">
                       <div className="contribution-bar w-3/4"></div>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span>Contributions</span>
-                    <span className="text-holo-gold" data-testid="text-contributions">{currentUser.contributions.toLocaleString()}</span>
+                      <span className="text-holo-gold" data-testid="text-contributions">{currentUser?.contributions?.toLocaleString?.() ?? 0}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-            
-            {/* Profile Actions */}
-            <div className="flex justify-between mt-3 pt-3 border-t border-purple-deep/50">
-              <Link href={`/profile/${(user as any)?.id || 'me'}/edit`}>
+              </Link>
+              {/* Profile Actions */}
+              <div className="flex justify-between mt-3 pt-3 border-t border-purple-deep/50">
+                <Link href={`/profile/${user?.id || 'me'}/edit`}>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-400 hover:text-electric-green p-1 h-auto"
+                    data-testid="button-edit-profile"
+                  >
+                    <Edit3 size={14} />
+                  </Button>
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   className="text-gray-400 hover:text-electric-green p-1 h-auto"
-                  data-testid="button-edit-profile"
+                  data-testid="button-settings"
                 >
-                  <Edit3 size={14} />
+                  <Settings size={14} />
                 </Button>
-              </Link>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-electric-green p-1 h-auto"
-                data-testid="button-settings"
-              >
-                <Settings size={14} />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-red-400 p-1 h-auto"
-                onClick={() => window.location.href = '/api/logout'}
-                data-testid="button-logout"
-              >
-                <LogOut size={14} />
-              </Button>
-            </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-400 hover:text-red-400 p-1 h-auto"
+                  onClick={() => window.location.href = '/api/logout'}
+                  data-testid="button-logout"
+                >
+                  <LogOut size={14} />
+                </Button>
+              </div>
             </>
           ) : (
             <div className="text-center">
@@ -161,7 +160,7 @@ export default function Navigation() {
                 >
                   <Icon className="text-neon-cyan" size={20} />
                   <span className="text-white">{item.label}</span>
-                  {item.count > 0 && (
+                  {typeof item.count === 'number' && item.count > 0 && (
                     <span className="ml-auto text-xs bg-electric-green text-space px-2 py-1 rounded-full" data-testid={`nav-count-${item.label.toLowerCase()}`}>
                       {item.count}
                     </span>
@@ -191,7 +190,7 @@ export default function Navigation() {
                   >
                     <Icon className="text-neon-cyan" size={20} />
                     <span className="text-white">{item.label}</span>
-                    {item.count > 0 && (
+                    {typeof item.count === 'number' && item.count > 0 && (
                       <span className="ml-auto text-xs bg-electric-green text-space px-2 py-1 rounded-full" data-testid={`nav-count-${item.label.toLowerCase()}`}>
                         {item.count}
                       </span>
