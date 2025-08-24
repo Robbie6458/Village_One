@@ -15,10 +15,12 @@ import Crowdfunding from "@/pages/crowdfunding";
 import Profile from "@/pages/profile-working";
 import ProfileEdit from "@/pages/profile-edit";
 
-
 import Operations from "@/pages/operations";
 import Ownership from "@/pages/ownership";
 import NotFound from "@/pages/not-found";
+
+// 👇 import the test component
+import AuthTest from "@/components/AuthTest";
 
 function Router() {
   return (
@@ -35,6 +37,9 @@ function Router() {
       <Route path="/forum/ownership" component={Ownership} />
       <Route path="/profile/:id" component={Profile} />
       <Route path="/profile/:id/edit" component={ProfileEdit} />
+
+      {/* 👇 add a temporary route for testing Supabase */}
+      <Route path="/auth-test" component={AuthTest} />
 
       <Route component={NotFound} />
     </Switch>
