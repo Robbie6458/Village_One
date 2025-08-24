@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { ARCHETYPE_OPTIONS } from "@shared/schema";
+import { ARCHETYPE_OPTIONS } from "@shared/types";
 
 export function useArchetype() {
   const archetypeMutation = useMutation({

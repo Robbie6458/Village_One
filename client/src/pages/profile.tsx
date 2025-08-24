@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { FORUM_SECTIONS } from "@shared/schema";
+import { FORUM_SECTIONS } from "@shared/types";
 
 const ARCHETYPE_ICONS = {
   "Builder": Hammer,

@@ -13,7 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import PostCard from "@/components/ui/post-card";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import { Plus, ArrowUp, ArrowDown, Brain, Home, ChevronRight, Mountain, Sprout, Users, Building, ServerCog, MessageCircle, User, Calendar } from "lucide-react";
-import { FORUM_SECTIONS, type Post, type User as UserType } from "@shared/schema";
+import { FORUM_SECTIONS, type Post, type User as UserType } from "@shared/types";
 import { formatDistanceToNow } from "date-fns";
 
 const postFormSchema = z.object({
