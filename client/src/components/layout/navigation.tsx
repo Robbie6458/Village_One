@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { 
   Mountain, 
   Sprout, 
@@ -39,7 +38,7 @@ const FORUM_SECTIONS = [
 export default function Navigation() {
   const [location] = useLocation();
   const [chatOpen, setChatOpen] = useState(false);
-  const { user, isLoading, isAuthenticated } = useAuth() as { user: { id: string; username?: string; email?: string; archetype?: string; level?: number; contributions?: number; profileImageUrl?: string } | null, isLoading: boolean, isAuthenticated: boolean };
+  const { user, isAuthenticated, signOut } = useAuth() as { user: { id: string; username?: string; email?: string; archetype?: string; level?: number; contributions?: number; profileImageUrl?: string } | null, isAuthenticated: boolean, signOut: () => Promise<void> };
 
   const currentUser = isAuthenticated && user ? {
     name: (user as any).username || (user as any).email?.split('@')[0] || 'User',
@@ -114,11 +113,11 @@ export default function Navigation() {
                 >
                   <Settings size={14} />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className="text-gray-400 hover:text-red-400 p-1 h-auto"
-                  onClick={() => window.location.href = '/api/logout'}
+                  onClick={signOut}
                   data-testid="button-logout"
                 >
                   <LogOut size={14} />
@@ -206,16 +205,16 @@ export default function Navigation() {
         <div className="mt-8 pt-6 border-t border-purple-deep space-y-3">
           {/* Login/Logout Button */}
           {isAuthenticated ? (
-            <Button 
+            <Button
               className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold py-3 rounded-lg hover:scale-105 transition-transform duration-300"
-              onClick={() => window.location.href = '/api/logout'}
+              onClick={signOut}
               data-testid="button-logout"
             >
               <LogOut size={16} />
               <span>Logout</span>
             </Button>
           ) : (
-            <Button 
+            <Button
               className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-holo-gold to-electric-green text-space font-semibold py-3 rounded-lg hover:scale-105 transition-transform duration-300"
               onClick={() => window.location.href = '/api/login'}
               data-testid="button-login"
