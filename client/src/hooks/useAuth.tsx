@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import type { Profile } from "@shared/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextValue {
   user: User | null;
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const checkedProfiles = useRef<Set<string>>(new Set());
+  const { toast } = useToast();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -39,9 +41,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .select("id")
             .eq("id", user.id);
           if (data && data.length === 0) {
-            await supabase
+            const { error } = await supabase
               .from("profiles")
               .insert({ id: user.id, display_name: user.email });
+            if (error) {
+              console.error("Error creating profile", error);
+              toast({
+                title: "Failed to create profile",
+                description: error.message,
+                variant: "destructive",
+              });
+              return;
+            }
           }
           checkedProfiles.current.add(user.id);
         }
