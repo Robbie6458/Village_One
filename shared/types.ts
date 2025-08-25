@@ -18,6 +18,7 @@ export interface Post {
   title: string;
   body: string | null;
   created_at: string;         // ISO timestamp
+  updatedAt?: string;         // ISO timestamp of last update
 }
 
 /** Convenience shapes */

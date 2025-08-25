@@ -20,21 +20,30 @@ export default async function handler(req: any, res: any) {
 
   let userId = rawId;
   if (rawId === 'me') {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    if (error || !user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    userId = user.id;
+const authHeader = req.headers?.authorization;
+const token = authHeader?.startsWith('Bearer ')
+  ? authHeader.slice(7)
+  : authHeader;
+
+const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+if (userError || !userData.user) {
+  return res.status(401).json({ error: 'Unauthorized' });
+}
+
+userId = userData.user.id;
+
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id')
     .eq('id', userId)
     .single();
+
+  if (profileError) {
+    return res.status(500).json({ error: profileError.message });
+  }
 
   if (!profile) {
     return res.status(404).json({ error: 'User not found' });
