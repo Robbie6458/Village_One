@@ -1,7 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl) {
+  throw new Error('Missing environment variable: SUPABASE_URL');
+}
+
+if (!serviceRoleKey) {
+  throw new Error('Missing environment variable: SUPABASE_SERVICE_ROLE_KEY');
+}
 
 // Handler for GET /api/users/:id or /api/users/me
 export default async function handler(req: any, res: any) {
@@ -16,11 +24,13 @@ export default async function handler(req: any, res: any) {
 
     let userId = rawId;
     if (rawId === 'me') {
-      const sessionUser = req.session?.user || req.user;
-      if (!sessionUser?.id) {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !userData.user) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
-      userId = sessionUser.id;
+
+      userId = userData.user.id;
     }
 
     const { data, error } = await supabase
