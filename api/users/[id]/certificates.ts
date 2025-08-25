@@ -7,11 +7,20 @@ export default async function handler(req: any, res: any) {
 
   let userId = rawId;
   if (rawId === 'me') {
-    const sessionUser = req.session?.user || req.user;
-    if (!sessionUser?.id) {
+    const authHeader = req.headers?.authorization;
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader;
+
+    const { data: userData, error: userError } = await supabase.auth.getUser(
+      token
+    );
+
+    if (userError || !userData.user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    userId = sessionUser.id;
+
+    userId = userData.user.id;
   }
 
   const { data: profile } = await supabase
