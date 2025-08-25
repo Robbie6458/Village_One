@@ -80,7 +80,7 @@ export default function Profile() {
   });
 
   const { data: userPosts, isLoading: postsLoading } = useQuery({
-    queryKey: ['/api/posts/user', userId === 'me' && currentUser ? (currentUser as any).id : userId],
+    queryKey: ['/api/posts/user', userId === 'me' && currentUser ? currentUser.id : userId],
     enabled: !!userId,
   });
 
@@ -100,7 +100,7 @@ export default function Profile() {
   });
 
   // Check if viewing own profile
-  const isOwnProfile = isAuthenticated && (userId === 'me' || (userId === (currentUser as any)?.id));
+  const isOwnProfile = isAuthenticated && (userId === 'me' || userId === currentUser?.id);
 
   const { data: userDrafts } = useQuery({
     queryKey: ['/api/users/me/drafts'],

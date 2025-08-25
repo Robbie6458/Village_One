@@ -41,17 +41,12 @@ export default function Navigation() {
   const { user, profile, isAuthenticated, signOut } = useAuth();
 
   const currentUser = isAuthenticated && user ? {
-    name:
-      (profile as any)?.username ||
-      (profile as any)?.displayName ||
-      user.email?.split("@")[0] ||
-      "User",
-    archetype: (profile as any)?.archetype || "Village Builder",
-    level: (profile as any)?.level || 1,
-    contributions: (profile as any)?.contributions || 0,
+    name: profile?.displayName || user.email?.split("@")[0] || "User",
+    archetype: "Village Builder",
+    level: 1,
+    contributions: 0,
     avatar:
-      (profile as any)?.profileImageUrl ||
-      (profile as any)?.avatarUrl ||
+      profile?.avatarUrl ||
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80",
   } : null;
 
