@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest } from "@/lib/queryClient";
 import PostCard from "@/components/ui/post-card";
 import RichTextEditor from "@/components/ui/rich-text-editor";
+import { useAuth } from "@/hooks/useAuth";
 import { Plus, ArrowUp, ArrowDown, Brain, Home, ChevronRight, Mountain, Sprout, Users, Building, ServerCog, MessageCircle, User, Calendar } from "lucide-react";
-import { FORUM_SECTIONS, type Post, type User as UserType } from "../../../shared/types";
+import { FORUM_SECTIONS, type Post, type Profile as UserType } from "../../../shared/types";
 import { formatDistanceToNow } from "date-fns";
 
 const postFormSchema = z.object({
@@ -29,6 +29,7 @@ export default function Forum() {
   const { section } = useParams<{ section: string }>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
 
   if (!section || !FORUM_SECTIONS.some(s => s.id === section)) {
     return (
@@ -41,15 +42,11 @@ export default function Forum() {
     );
   }
 
-  const { data: currentUser } = useQuery({
-    queryKey: ['/api/auth/user'],
-  });
-
   const { data: posts = [], isLoading } = useQuery<PostWithAuthor[]>({
     queryKey: [`/api/posts/${section}`],
   });
 
-  const { data: sentiment } = useQuery({
+  const { data: sentiment } = useQuery<any>({
     queryKey: [`/api/forum/${section}/sentiment`],
   });
 

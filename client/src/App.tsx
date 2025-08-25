@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/lib/error-boundary";
 import Navigation from "@/components/layout/navigation";
+import { AuthProvider } from "@/hooks/useAuth";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Forum from "@/pages/forum";
@@ -50,17 +51,19 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <div className="min-h-screen bg-space text-white">
-            <Navigation />
-            <main className="ml-64">
-              <ErrorBoundary>
-                <Router />
-              </ErrorBoundary>
-            </main>
-          </div>
-          <Toaster />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <div className="min-h-screen bg-space text-white">
+              <Navigation />
+              <main className="ml-64">
+                <ErrorBoundary>
+                  <Router />
+                </ErrorBoundary>
+              </main>
+            </div>
+            <Toaster />
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
