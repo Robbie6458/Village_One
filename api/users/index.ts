@@ -6,13 +6,13 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { data, error } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id, username, archetype, level');
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  if (profileError) {
+    return res.status(500).json({ error: profileError.message });
   }
 
-  return res.status(200).json(data || []);
+  return res.status(200).json(profile || []);
 }

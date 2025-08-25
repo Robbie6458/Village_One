@@ -23,11 +23,15 @@ export default async function handler(req: any, res: any) {
     userId = userData.user.id;
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id')
     .eq('id', userId)
     .single();
+
+  if (profileError) {
+    return res.status(500).json({ error: profileError.message });
+  }
 
   if (!profile) {
     return res.status(404).json({ error: 'User not found' });
