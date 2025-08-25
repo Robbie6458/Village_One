@@ -40,9 +40,11 @@ export default function Login() {
   };
 
   const signInOAuth = async (provider: "google" | "github") => {
+    const redirectTo =
+      import.meta.env.VITE_SUPABASE_REDIRECT_URL || window.location.origin;
     await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo },
     });
   };
 
