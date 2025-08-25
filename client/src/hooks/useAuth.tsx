@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -17,6 +17,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const checkedProfiles = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -24,10 +25,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(data.session?.user ?? null);
       setIsLoading(false);
     });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+        const user = session?.user ?? null;
+        setUser(user);
+        if (user && !checkedProfiles.current.has(user.id)) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id);
+          if (data && data.length === 0) {
+            await supabase
+              .from("profiles")
+              .insert({ id: user.id, display_name: user.email });
+          }
+          checkedProfiles.current.add(user.id);
+        }
+      }
+    );
     return () => {
       listener.subscription.unsubscribe();
     };
