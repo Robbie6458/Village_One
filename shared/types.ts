@@ -6,9 +6,9 @@ export type UserId = string;
 /** profiles table */
 export interface Profile {
   id: UserId;                 // PK, auth.users.id
-  display_name: string | null;
-  avatar_url: string | null;
-  created_at: string;         // ISO timestamp
+  displayName: string | null;
+  avatarUrl: string | null;
+  createdAt: string;         // ISO timestamp
 }
 
 /** posts table */
