@@ -30,7 +30,10 @@ export default function Login() {
   };
 
   const signInOAuth = async (provider: "google" | "github") => {
-    await supabase.auth.signInWithOAuth({ provider });
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: window.location.origin },
+    });
   };
 
   return (
