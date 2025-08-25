@@ -2,6 +2,9 @@ import { supabase } from '../lib/supabase';
 
 // GET /api/posts/user/:id - fetch posts authored by given user
 export default async function handler(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
   // Support ID via route param or query string
   let userId: string | undefined = req.query?.id || req.query?.userId;
   if (!userId && typeof req.url === 'string') {

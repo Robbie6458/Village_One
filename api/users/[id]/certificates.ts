@@ -2,6 +2,9 @@ import { supabase } from '../../lib/supabase';
 
 // GET /api/users/:id/certificates
 export default async function handler(req: any, res: any) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
   const { id } = req.query || {};
   const rawId = Array.isArray(id) ? id[0] : id;
 
