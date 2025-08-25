@@ -27,7 +27,7 @@ It’s a prototype for exploring how digital spaces can model collaboration, dis
    ```bash
    npm install
    ```
-3. Copy `.env.example` to `.env` and fill in your Supabase + OpenAI keys
+3. Copy `.env.example` to `.env` and fill in your Supabase keys and redirect URL
 4. Run locally:
    ```bash
    npm run dev
