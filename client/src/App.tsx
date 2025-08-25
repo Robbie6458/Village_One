@@ -15,6 +15,7 @@ import Questionnaire from "@/pages/questionnaire";
 import Crowdfunding from "@/pages/crowdfunding";
 import Profile from "@/pages/profile-working";
 import ProfileEdit from "@/pages/profile-edit";
+import Login from "@/pages/login";
 
 import Operations from "@/pages/operations";
 import Ownership from "@/pages/ownership";
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/forum/ownership" component={Ownership} />
       <Route path="/profile/:id" component={Profile} />
       <Route path="/profile/:id/edit" component={ProfileEdit} />
+      <Route path="/login" component={Login} />
 
       {/* 👇 add a temporary route for testing Supabase */}
       <Route path="/auth-test" component={AuthTest} />

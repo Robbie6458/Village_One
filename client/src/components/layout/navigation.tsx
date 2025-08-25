@@ -131,13 +131,14 @@ export default function Navigation() {
               </div>
               <h3 className="font-semibold text-white mb-2">Join Village-One</h3>
               <p className="text-xs text-gray-400 mb-3">Connect with builders creating a sustainable future</p>
-              <Button 
-                className="w-full bg-gradient-to-r from-holo-gold to-electric-green text-space font-semibold py-2 px-4 rounded-lg hover:scale-105 transition-transform duration-300 text-sm"
-                onClick={() => window.location.href = '/api/login'}
-                data-testid="button-join-community"
-              >
-                Create Account
-              </Button>
+              <Link href="/login">
+                <Button
+                  className="w-full bg-gradient-to-r from-holo-gold to-electric-green text-space font-semibold py-2 px-4 rounded-lg hover:scale-105 transition-transform duration-300 text-sm"
+                  data-testid="button-join-community"
+                >
+                  Create Account
+                </Button>
+              </Link>
             </div>
           )}
         </div>
@@ -214,14 +215,15 @@ export default function Navigation() {
               <span>Logout</span>
             </Button>
           ) : (
-            <Button
-              className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-holo-gold to-electric-green text-space font-semibold py-3 rounded-lg hover:scale-105 transition-transform duration-300"
-              onClick={() => window.location.href = '/api/login'}
-              data-testid="button-login"
-            >
-              <LogIn size={16} />
-              <span>Login</span>
-            </Button>
+            <Link href="/login">
+              <Button
+                className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-holo-gold to-electric-green text-space font-semibold py-3 rounded-lg hover:scale-105 transition-transform duration-300"
+                data-testid="button-login"
+              >
+                <LogIn size={16} />
+                <span>Login</span>
+              </Button>
+            </Link>
           )}
           
           <Button 
