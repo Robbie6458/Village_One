@@ -3,6 +3,13 @@ import { createServerClient } from '@supabase/ssr';
 export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request) {
+  if (req.method !== 'GET') {
+    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const supabase = createServerClient(
     process.env.SUPABASE_URL!,
     process.env.SERVICE_ROLE_KEY!,
