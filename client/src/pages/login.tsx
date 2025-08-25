@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,20 +13,29 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { signIn, signUp } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     const { email, password } = form;
-    const { error: authError } =
-      mode === "signin"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
-    setLoading(false);
-    if (authError) {
+    try {
+      const { session } =
+        mode === "signin"
+          ? await signIn(email, password)
+          : await signUp(email, password);
+      if (!session) {
+        if (mode === "signup") {
+          setError("Check your email for a confirmation link");
+        }
+      } else {
+        setLocation("/");
+      }
+    } catch (authError: any) {
       setError(authError.message);
-    } else {
-      setLocation("/");
+    } finally {
+      setLoading(false);
     }
   };
 
