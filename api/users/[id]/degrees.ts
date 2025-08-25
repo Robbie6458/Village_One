@@ -1,7 +1,13 @@
-import { supabase } from '../../lib/supabase';
+import { createServerClient } from '@supabase/ssr';
+
+const supabaseUrl = process.env.SUPABASE_URL!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // GET /api/users/:id/degrees
 export default async function handler(req: any, res: any) {
+  const supabase = createServerClient(supabaseUrl, serviceRoleKey, {
+    cookies: { get: () => req.headers.cookie },
+  });
   const { id } = req.query || {};
   const rawId = Array.isArray(id) ? id[0] : id;
 

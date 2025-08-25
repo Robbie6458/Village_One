@@ -1,7 +1,13 @@
-import { supabase } from '../lib/supabase';
+import { createServerClient } from '@supabase/ssr';
+
+const supabaseUrl = process.env.SUPABASE_URL!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // GET /api/posts/user/:id - fetch posts authored by given user
 export default async function handler(req: any, res: any) {
+  const supabase = createServerClient(supabaseUrl, serviceRoleKey, {
+    cookies: { get: () => req.headers.cookie },
+  });
   // Support ID via route param or query string
   let userId: string | undefined = req.query?.id || req.query?.userId;
   if (!userId && typeof req.url === 'string') {

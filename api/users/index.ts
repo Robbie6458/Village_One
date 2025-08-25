@@ -1,7 +1,13 @@
-import { supabase } from '../lib/supabase';
+import { createServerClient } from '@supabase/ssr';
+
+const supabaseUrl = process.env.SUPABASE_URL!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // GET /api/users - return list of user profiles
 export default async function handler(req: any, res: any) {
+  const supabase = createServerClient(supabaseUrl, serviceRoleKey, {
+    cookies: { get: () => req.headers.cookie },
+  });
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
