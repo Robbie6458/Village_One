@@ -15,6 +15,7 @@ import Questionnaire from "@/pages/questionnaire";
 import Crowdfunding from "@/pages/crowdfunding";
 import Profile from "@/pages/profile-working";
 import ProfileEdit from "@/pages/profile-edit";
+import LoginPage from "@/pages/login";
 
 import Operations from "@/pages/operations";
 import Ownership from "@/pages/ownership";
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/forum/:section" component={Forum} />
       <Route path="/post/:id" component={PostPage} />
       <Route path="/people" component={People} />
+      <Route path="/login" component={LoginPage} />
 
       <Route path="/questionnaire" component={Questionnaire} />
       <Route path="/crowdfunding" component={Crowdfunding} />
