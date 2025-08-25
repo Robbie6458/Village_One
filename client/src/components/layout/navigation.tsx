@@ -38,14 +38,21 @@ const FORUM_SECTIONS = [
 export default function Navigation() {
   const [location] = useLocation();
   const [chatOpen, setChatOpen] = useState(false);
-  const { user, isAuthenticated, signOut } = useAuth() as { user: { id: string; username?: string; email?: string; archetype?: string; level?: number; contributions?: number; profileImageUrl?: string } | null, isAuthenticated: boolean, signOut: () => Promise<void> };
+  const { user, profile, isAuthenticated, signOut } = useAuth();
 
   const currentUser = isAuthenticated && user ? {
-    name: (user as any).username || (user as any).email?.split('@')[0] || 'User',
-    archetype: (user as any).archetype || 'Village Builder',
-    level: (user as any).level || 1,
-    contributions: (user as any).contributions || 0,
-    avatar: (user as any).profileImageUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80"
+    name:
+      (profile as any)?.username ||
+      (profile as any)?.displayName ||
+      user.email?.split("@")[0] ||
+      "User",
+    archetype: (profile as any)?.archetype || "Village Builder",
+    level: (profile as any)?.level || 1,
+    contributions: (profile as any)?.contributions || 0,
+    avatar:
+      (profile as any)?.profileImageUrl ||
+      (profile as any)?.avatarUrl ||
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80",
   } : null;
 
   return (
