@@ -1,11 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+  const supabase = createServerClient(supabaseUrl, serviceRoleKey, {
+    cookies: { get: () => req.headers.cookie },
     auth: { autoRefreshToken: false, persistSession: false },
     global: { headers: { Authorization: req.headers.authorization || '' } },
   });
