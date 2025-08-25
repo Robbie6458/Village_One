@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
+import { createClient } from '@supabase/supabase-js';
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -24,7 +26,14 @@ export default async function handler(req: any, res: any) {
 
     let userId = rawId;
     if (rawId === 'me') {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const authHeader = req.headers?.authorization;
+      const token = authHeader?.startsWith('Bearer ')
+        ? authHeader.slice(7)
+        : authHeader;
+
+      const { data: userData, error: userError } = await supabase.auth.getUser(
+        token
+      );
 
       if (userError || !userData.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -48,6 +57,59 @@ export default async function handler(req: any, res: any) {
     }
 
     return res.status(200).json(profile);
+  }
+
+  if (req.method === 'PATCH') {
+    const authHeader = req.headers?.authorization;
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader;
+
+    const { data: userData, error: userError } = await supabase.auth.getUser(
+      token
+    );
+
+    if (userError || !userData.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const {
+      firstName,
+      lastName,
+      bio,
+      socialLinks,
+      profileImageUrl,
+    } = req.body ?? {};
+
+    const updates: any = {};
+    if (typeof firstName === 'string') updates.firstName = firstName;
+    if (typeof lastName === 'string') updates.lastName = lastName;
+    if (typeof bio === 'string') updates.bio = bio;
+    if (typeof socialLinks !== 'undefined') updates.socialLinks = socialLinks;
+    if (typeof profileImageUrl === 'string') updates.profileImageUrl =
+      profileImageUrl;
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userData.user.id)
+      .select()
+      .single();
+
+    if (profileError) {
+      return res.status(500).json({ error: profileError.message });
+    }
+
+    if (!profile) {
+      return res.status(500).json({ error: 'Update failed' });
+    }
+
+    return res.status(200).json(profile);
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' });
+}
+
   }
 
   if (req.method === 'PATCH') {
