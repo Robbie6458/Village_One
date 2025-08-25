@@ -10,7 +10,10 @@ export default async function handler(req: any, res: any) {
     global: { headers: { Authorization: req.headers.authorization || '' } },
   });
 
-  const token = req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers?.authorization;
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : authHeader;
 
   if (req.method === 'GET') {
     const { id } = req.query || {};
@@ -65,18 +68,21 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    const { data, error } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .update(updates)
       .eq('id', userId)
       .select()
       .single();
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
+    if (profileError) {
+      return res.status(500).json({ error: profileError.message });
+    }
+    if (!profile) {
+      return res.status(500).json({ error: 'Update failed' });
     }
 
-    return res.status(200).json(data);
+    return res.status(200).json(profile);
   }
 
   return res.status(405).json({ error: 'Method Not Allowed' });
