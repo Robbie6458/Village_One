@@ -1,7 +1,14 @@
+/**
+ * Village Community Page
+ * Displays a comprehensive view of all community members, their archetypes,
+ * and contributions. Includes filtering, sorting, and search capabilities.
+ */
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Link } from "wouter";
+import { supabase } from "@/lib/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +34,13 @@ export default function People() {
     }
   }, [location]);
 
-  const { profiles: users, isLoading, error } = useCommunityProfiles();
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ['community-profiles'],
+    queryFn: async () => {
+      const { fetchCommunityProfiles } = await import('@/api/profiles');
+      return fetchCommunityProfiles();
+    }
+  });
 
   // Filter and sort users
   const filteredUsers = users
