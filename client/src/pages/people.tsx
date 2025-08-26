@@ -10,6 +10,7 @@ import VillageCard from "@/components/ui/village-card";
 import { Search, Users, Filter, User, Instagram, Facebook } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 import { ARCHETYPE_OPTIONS } from "@shared/types";
+import { useCommunityProfiles } from "@/hooks/use-community";
 
 export default function People() {
   const [location] = useLocation();
@@ -26,16 +27,18 @@ export default function People() {
     }
   }, [location]);
 
-  const { data: users = [], isLoading } = useQuery<any[]>({
-    queryKey: ['/api/users'],
-  });
+  const { profiles: users, isLoading, error } = useCommunityProfiles();
 
   // Filter and sort users
   const filteredUsers = users
     .filter((user: any) => {
-      const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (user.archetype && user.archetype.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesArchetype = selectedArchetype === "all" || user.archetype === selectedArchetype;
+      // Use displayName since profiles table doesn't have username field
+      const displayName = user.displayName || user.display_name || '';
+      const archetype = user.archetype || '';
+      
+      const matchesSearch = displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           archetype.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesArchetype = selectedArchetype === "all" || archetype === selectedArchetype;
       return matchesSearch && matchesArchetype;
     })
     .sort((a: any, b: any) => {
@@ -43,9 +46,15 @@ export default function People() {
         case "level":
           return (b.level || 0) - (a.level || 0);
         case "contributions":
-          return (b.contributions || 0) - (a.contributions || 0);
+          // Use post_count + comment_count as contributions metric
+          const aContributions = (a.stats?.post_count || 0) + (a.stats?.comment_count || 0);
+          const bContributions = (b.stats?.post_count || 0) + (b.stats?.comment_count || 0);
+          return bContributions - aContributions;
         case "username":
-          return a.username.localeCompare(b.username);
+          // Sort by displayName since that's what we have
+          const aName = a.displayName || a.display_name || '';
+          const bName = b.displayName || b.display_name || '';
+          return aName.localeCompare(bName);
         default:
           return 0;
       }
@@ -91,7 +100,10 @@ export default function People() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-electric-green" data-testid="text-active-contributors">
-                {users.filter((user: any) => (user.contributions || 0) > 0).length}
+                {users.filter((user: any) => {
+                  const contributions = (user.stats?.post_count || 0) + (user.stats?.comment_count || 0);
+                  return contributions > 0;
+                }).length}
               </div>
             </CardContent>
           </Card>
@@ -180,7 +192,7 @@ export default function People() {
                 <SelectContent className="bg-void border-purple-deep">
                   <SelectItem value="level">Level (High to Low)</SelectItem>
                   <SelectItem value="contributions">Contributions (High to Low)</SelectItem>
-                  <SelectItem value="username">Username (A-Z)</SelectItem>
+                  <SelectItem value="username">Name (A-Z)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
