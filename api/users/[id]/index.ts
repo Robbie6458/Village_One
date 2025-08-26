@@ -72,20 +72,17 @@ export default async function handler(req: any, res: any) {
     }
 
     const {
-      firstName,
-      lastName,
+      displayName,
       bio,
       socialLinks,
-      profileImageUrl,
+      avatarUrl,
     } = req.body ?? {};
 
     const updates: any = {};
-    if (typeof firstName === 'string') updates.firstName = firstName;
-    if (typeof lastName === 'string') updates.lastName = lastName;
+    if (typeof displayName === 'string') updates.display_name = displayName;
     if (typeof bio === 'string') updates.bio = bio;
-    if (typeof socialLinks !== 'undefined') updates.socialLinks = socialLinks;
-    if (typeof profileImageUrl === 'string') updates.profileImageUrl =
-      profileImageUrl;
+    if (typeof socialLinks !== 'undefined') updates.social_links = socialLinks;
+    if (typeof avatarUrl === 'string') updates.avatar_url = avatarUrl;
 
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
