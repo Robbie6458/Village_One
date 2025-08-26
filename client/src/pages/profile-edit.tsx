@@ -82,7 +82,7 @@ export default function ProfileEdit() {
     mutationFn: async (updates: any) => {
       const { updateProfile } = await import('@/api/profile');
       return updateProfile({
-        displayName: updates.displayName,
+        displayName: updates.username, // Using username as display_name
         bio: updates.bio,
         socialLinks: updates.socialLinks,
         avatarUrl: updates.profileImageUrl,
@@ -141,11 +141,11 @@ export default function ProfileEdit() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Combine firstName and lastName into displayName for database storage
-    const displayName = `${firstName.trim()} ${lastName.trim()}`.trim();
-    
     const updates = {
-      displayName: displayName || username, // Use combined name or fall back to username
+      firstName,
+      lastName, 
+      username,
+      email,
       bio,
       socialLinks,
       profileImageUrl: profileImage,
@@ -248,12 +248,11 @@ export default function ProfileEdit() {
                   id="email"
                   type="email"
                   value={email}
-                  readOnly
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="bg-purple-deep border-purple-light text-white opacity-75"
+                  className="bg-purple-deep border-purple-light text-white"
                   data-testid="input-email"
                 />
-                <p className="text-xs text-gray-400">Email is managed through your account settings and cannot be changed here.</p>
               </div>
             </CardContent>
           </Card>
