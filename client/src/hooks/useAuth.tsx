@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     supabase
       .from("profiles")
-      .select("id, display_name, avatar_url, created_at, archetype, level, bio, socialLinks")
+      .select("id, display_name, avatar_url, created_at, archetype, level, bio, social_links")
       .eq("id", user.id)
       .single()
       .then(({ data, error }) => {
@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             archetype: data.archetype ?? null,
             level: data.level ?? 1,
             bio: data.bio ?? "",
-            socialLinks: data.socialLinks ?? {},
+            socialLinks: data.social_links ?? {},
           };
           setProfile(mapped);
         }
