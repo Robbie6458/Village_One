@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,28 @@ export default function ProfileEdit() {
   const [profileImage, setProfileImage] = useState("");
 
   const { data: userData, isLoading } = useQuery({
-    queryKey: ['/api/users', 'me'],
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      return {
+        ...data,
+        email: user.email,
+        username: data.display_name,
+        firstName: data.display_name?.split(' ')[0],
+        lastName: data.display_name?.split(' ')[1],
+        profileImageUrl: data.avatar_url,
+        socialLinks: data.social_links
+      };
+    },
     enabled: isAuthenticated,
   });
 
@@ -58,20 +80,29 @@ export default function ProfileEdit() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
-      return apiRequest(`/api/users/me`, "PATCH", updates);
+      const { updateProfile } = await import('@/api/profile');
+      return updateProfile({
+        displayName: updates.username, // Using username as display_name
+        bio: updates.bio,
+        socialLinks: updates.socialLinks,
+        avatarUrl: updates.profileImageUrl,
+      });
     },
     onSuccess: () => {
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
       });
+      // Invalidate both profile and users queries
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
       queryClient.invalidateQueries({ queryKey: ['/api/users'] });
       navigate(`/profile/me`);
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Profile update error:', error);
       toast({
         title: "Update Failed",
-        description: "There was an error updating your profile.",
+        description: error.message || "There was an error updating your profile.",
         variant: "destructive",
       });
     },
