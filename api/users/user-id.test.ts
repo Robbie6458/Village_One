@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 process.env.SUPABASE_URL = 'https://example.com';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
 
-const profile = { id: '123', firstName: 'John' };
+const profile = { id: '123', display_name: 'John Doe' };
 
 const supabaseMock = {
   auth: {
@@ -60,10 +60,10 @@ test('PATCH updates user profile', async () => {
   const req = {
     method: 'PATCH',
     headers: { authorization: 'Bearer token' },
-    body: { firstName: 'New' },
+    body: { displayName: 'New Name' },
   } as any;
   const res = createRes();
   await handler(req, res);
   assert.equal(res.statusCode, 200);
-  assert.deepEqual(res.jsonData, { id: 'user-1', firstName: 'New' });
+  assert.deepEqual(res.jsonData, { id: 'user-1', display_name: 'New Name' });
 });
