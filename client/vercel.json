@@ -1,6 +1,11 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist", 
+  "devCommand": "npm run dev",
+  "installCommand": "npm ci",
+  "framework": null,
   "functions": {
-    "api/posts.ts": {
+    "../api/posts.ts": {
       "maxDuration": 30
     }
   },
