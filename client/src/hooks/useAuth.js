@@ -1,0 +1,109 @@
+import { jsx as _jsx } from "react/jsx-runtime";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/hooks/use-toast";
+const AuthContext = createContext(undefined);
+export function AuthProvider({ children }) {
+    const [session, setSession] = useState(null);
+    const [user, setUser] = useState(null);
+    const [profile, setProfile] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const checkedProfiles = useRef(new Set());
+    const { toast } = useToast();
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data }) => {
+            setSession(data.session);
+            setUser(data.session?.user ?? null);
+            setIsLoading(false);
+        });
+        const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            setSession(session);
+            const user = session?.user ?? null;
+            setUser(user);
+            if (user && !checkedProfiles.current.has(user.id)) {
+                const { data } = await supabase
+                    .from("profiles")
+                    .select("id")
+                    .eq("id", user.id);
+                if (data && data.length === 0) {
+                    const { error } = await supabase
+                        .from("profiles")
+                        .insert({ id: user.id, display_name: user.email });
+                    if (error) {
+                        console.error("Error creating profile", error);
+                        toast({
+                            title: "Failed to create profile",
+                            description: error.message,
+                            variant: "destructive",
+                        });
+                        return;
+                    }
+                }
+                checkedProfiles.current.add(user.id);
+            }
+        });
+        return () => {
+            listener.subscription.unsubscribe();
+        };
+    }, []);
+    useEffect(() => {
+        if (!user) {
+            setProfile(null);
+            return;
+        }
+        supabase
+            .from("profiles")
+            .select("id, display_name, avatar_url, created_at, archetype, level, bio, social_links")
+            .eq("id", user.id)
+            .single()
+            .then(({ data, error }) => {
+            if (error) {
+                console.error("Error fetching profile", error);
+                setProfile(null);
+                return;
+            }
+            if (data) {
+                const mapped = {
+                    id: data.id,
+                    displayName: data.display_name,
+                    avatarUrl: data.avatar_url,
+                    createdAt: data.created_at,
+                    archetype: data.archetype ?? null,
+                    level: data.level ?? 1,
+                    bio: data.bio ?? "",
+                    socialLinks: data.social_links ?? {},
+                };
+                setProfile(mapped);
+            }
+        });
+    }, [user]);
+    const signIn = async (email, password) => {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error)
+            throw error;
+        return data;
+    };
+    const signUp = async (email, password) => {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error)
+            throw error;
+        return data;
+    };
+    const signOut = async () => {
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+    };
+    return (_jsx(AuthContext.Provider, { value: { user, profile, session, isLoading, signIn, signUp, signOut }, children: children }));
+}
+export function useAuth() {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return {
+        ...context,
+        isAuthenticated: !!context.user,
+    };
+}
