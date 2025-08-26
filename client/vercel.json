@@ -4,11 +4,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
   "framework": null,
-  "functions": {
-    "../api/posts.ts": {
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/assets/(.*)",
