@@ -79,7 +79,10 @@ export default function Profile() {
     return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
   };
 
-  // Use /api/users/me for own profile, /api/users/:id for others
+// Use /api/users/me for own profile, /api/users/:id for others
+// Check if viewing own profile
+const isOwnProfile = isAuthenticated && (userId === 'me' || userId === currentUser?.id);
+const profileEndpoint = isOwnProfile ? '/api/users/me' : `/api/users/${userId}`;
   const isOwnProfile = isAuthenticated && (userId === 'me' || userId === currentUser?.id);
   const profileEndpoint = isOwnProfile ? '/api/users/me' : `/api/users/${userId}`;
 
@@ -88,9 +91,9 @@ export default function Profile() {
     enabled: !!userId,
     queryFn: async () => {
       const headers = getAuthHeader();
-      const res = await fetch(profileEndpoint, {
-        headers: headers,
-      });
+const res = await fetch(profileEndpoint, {
+  headers: headers,
+});
       if (!res.ok) throw new Error('Failed to fetch user profile');
       return await res.json();
     },
@@ -99,31 +102,51 @@ export default function Profile() {
   const { data: userPosts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['/api/posts/user', isOwnProfile && currentUser ? currentUser.id : userId],
     enabled: !!userId,
-    // ...existing code...
+queryFn: async () => {
+  const res = await fetch(`/api/posts/user/${isOwnProfile && currentUser ? currentUser.id : userId}`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userDegrees = [], isLoading: degreesLoading } = useQuery({
     queryKey: ['/api/users', userId, 'degrees'],
     enabled: !!userId,
-    // ...existing code...
+queryFn: async () => {
+  const res = await fetch(`/api/users/${userId}/degrees`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userCertificates = [], isLoading: certificatesLoading } = useQuery({
     queryKey: ['/api/users', userId, 'certificates'],
     enabled: !!userId,
-    // ...existing code...
+queryFn: async () => {
+  const res = await fetch(`/api/users/${userId}/certificates`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userGallery = [], isLoading: galleryLoading } = useQuery({
     queryKey: ['/api/users', userId, 'gallery'],
     enabled: !!userId,
-    // ...existing code...
+queryFn: async () => {
+  const res = await fetch(`/api/users/${userId}/gallery`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userDrafts = [], isLoading: draftsLoading } = useQuery({
     queryKey: ['/api/users/me/drafts'],
     enabled: isOwnProfile && isAuthenticated,
-    // ...existing code...
+queryFn: async () => {
+  const res = await fetch(`/api/users/me/drafts`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   if (userLoading) {
