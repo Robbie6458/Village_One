@@ -6,13 +6,22 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: profiles, error: profileError } = await supabase
     .from('profiles')
-    .select('id, username, archetype, level');
+    .select('id, display_name, archetype, level');
 
   if (profileError) {
     return res.status(500).json({ error: profileError.message });
   }
 
-  return res.status(200).json(profile || []);
+  // Map database fields to frontend expected fields
+  const mappedProfiles = (profiles || []).map(profile => ({
+    id: profile.id,
+    username: profile.display_name || '',
+    displayName: profile.display_name || '',
+    archetype: profile.archetype || null,
+    level: profile.level || 1
+  }));
+
+  return res.status(200).json(mappedProfiles);
 }
