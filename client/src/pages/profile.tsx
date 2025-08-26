@@ -79,7 +79,10 @@ export default function Profile() {
     return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
   };
 
-  // Check if viewing own profile
+// Use /api/users/me for own profile, /api/users/:id for others
+// Check if viewing own profile
+const isOwnProfile = isAuthenticated && (userId === 'me' || userId === currentUser?.id);
+const profileEndpoint = isOwnProfile ? '/api/users/me' : `/api/users/${userId}`;
   const isOwnProfile = isAuthenticated && (userId === 'me' || userId === currentUser?.id);
   const profileEndpoint = isOwnProfile ? '/api/users/me' : `/api/users/${userId}`;
 
@@ -88,7 +91,9 @@ export default function Profile() {
     enabled: !!userId,
     queryFn: async () => {
       const headers = getAuthHeader();
-      const res = await fetch(profileEndpoint, { headers });
+const res = await fetch(profileEndpoint, {
+  headers: headers,
+});
       if (!res.ok) throw new Error('Failed to fetch user profile');
       return await res.json();
     },
@@ -97,51 +102,51 @@ export default function Profile() {
   const { data: userPosts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['/api/posts/user', isOwnProfile && currentUser ? currentUser.id : userId],
     enabled: !!userId,
-    queryFn: async () => {
-      const res = await fetch(`/api/posts/user/${isOwnProfile && currentUser ? currentUser.id : userId}`);
-      if (!res.ok) return [];
-      return await res.json();
-    },
+queryFn: async () => {
+  const res = await fetch(`/api/posts/user/${isOwnProfile && currentUser ? currentUser.id : userId}`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userDegrees = [], isLoading: degreesLoading } = useQuery({
     queryKey: ['/api/users', userId, 'degrees'],
     enabled: !!userId,
-    queryFn: async () => {
-      const res = await fetch(`/api/users/${userId}/degrees`);
-      if (!res.ok) return [];
-      return await res.json();
-    },
+queryFn: async () => {
+  const res = await fetch(`/api/users/${userId}/degrees`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userCertificates = [], isLoading: certificatesLoading } = useQuery({
     queryKey: ['/api/users', userId, 'certificates'],
     enabled: !!userId,
-    queryFn: async () => {
-      const res = await fetch(`/api/users/${userId}/certificates`);
-      if (!res.ok) return [];
-      return await res.json();
-    },
+queryFn: async () => {
+  const res = await fetch(`/api/users/${userId}/certificates`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userGallery = [], isLoading: galleryLoading } = useQuery({
     queryKey: ['/api/users', userId, 'gallery'],
     enabled: !!userId,
-    queryFn: async () => {
-      const res = await fetch(`/api/users/${userId}/gallery`);
-      if (!res.ok) return [];
-      return await res.json();
-    },
+queryFn: async () => {
+  const res = await fetch(`/api/users/${userId}/gallery`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   const { data: userDrafts = [], isLoading: draftsLoading } = useQuery({
     queryKey: ['/api/users/me/drafts'],
     enabled: isOwnProfile && isAuthenticated,
-    queryFn: async () => {
-      const res = await fetch(`/api/users/me/drafts`);
-      if (!res.ok) return [];
-      return await res.json();
-    },
+queryFn: async () => {
+  const res = await fetch(`/api/users/me/drafts`);
+  if (!res.ok) return [];
+  return await res.json();
+},
   });
 
   if (userLoading) {
@@ -295,7 +300,7 @@ export default function Profile() {
                   <div className="text-sm text-space-400">Contributions</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-holo-gold">{userPosts ? userPosts.length : 0}</div>
+                  <div className="text-2xl font-bold text-holo-gold">{Array.isArray(userPosts) ? userPosts.length : 0}</div>
                   <div className="text-sm text-space-400">Posts</div>
                 </div>
               </div>
@@ -426,7 +431,7 @@ export default function Profile() {
               )}
             </div>
             
-            {userDegrees && userDegrees.length > 0 ? (
+            {Array.isArray(userDegrees) && userDegrees.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {userDegrees.map((degree: any) => (
                   <Card key={degree.id}>
@@ -473,7 +478,7 @@ export default function Profile() {
               )}
             </div>
             
-            {userCertificates && userCertificates.length > 0 ? (
+            {Array.isArray(userCertificates) && userCertificates.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {userCertificates.map((cert: any) => (
                   <Card key={cert.id}>
@@ -526,7 +531,7 @@ export default function Profile() {
             )}
           </div>
           
-          {userGallery && userGallery.length > 0 ? (
+          {Array.isArray(userGallery) && userGallery.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {userGallery.map((image: any) => (
                 <Card key={image.id} className="overflow-hidden">
@@ -632,7 +637,7 @@ export default function Profile() {
               </Button>
             </div>
             
-            {userDrafts && userDrafts.length > 0 ? (
+            {Array.isArray(userDrafts) && userDrafts.length > 0 ? (
               <div className="space-y-4">
                 {userDrafts.map((draft: any) => (
                   <Card key={draft.id} className="hover:bg-space-800/30 transition-colors">
