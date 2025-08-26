@@ -71,40 +71,77 @@ const ARCHETYPE_COLORS = {
 export default function Profile() {
   const params = useParams();
   const userId = params.id;
-  const { user: currentUser, isAuthenticated } = useAuth();
+  const { user: currentUser, session, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("posts");
 
-  const { data: user, isLoading: userLoading } = useQuery({
-    queryKey: ['/api/users', userId],
-    enabled: !!userId,
-  });
-
-  const { data: userPosts, isLoading: postsLoading } = useQuery({
-    queryKey: ['/api/posts/user', userId === 'me' && currentUser ? currentUser.id : userId],
-    enabled: !!userId,
-  });
-
-  const { data: userDegrees } = useQuery({
-    queryKey: ['/api/users', userId, 'degrees'],
-    enabled: !!userId,
-  });
-
-  const { data: userCertificates } = useQuery({
-    queryKey: ['/api/users', userId, 'certificates'],
-    enabled: !!userId,
-  });
-
-  const { data: userGallery } = useQuery({
-    queryKey: ['/api/users', userId, 'gallery'],
-    enabled: !!userId,
-  });
+  // Helper to get auth header
+  const getAuthHeader = () => {
+    return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
+  };
 
   // Check if viewing own profile
   const isOwnProfile = isAuthenticated && (userId === 'me' || userId === currentUser?.id);
+  const profileEndpoint = isOwnProfile ? '/api/users/me' : `/api/users/${userId}`;
 
-  const { data: userDrafts } = useQuery({
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: [profileEndpoint],
+    enabled: !!userId,
+    queryFn: async () => {
+      const headers = getAuthHeader();
+      const res = await fetch(profileEndpoint, { headers });
+      if (!res.ok) throw new Error('Failed to fetch user profile');
+      return await res.json();
+    },
+  });
+
+  const { data: userPosts = [], isLoading: postsLoading } = useQuery({
+    queryKey: ['/api/posts/user', isOwnProfile && currentUser ? currentUser.id : userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const res = await fetch(`/api/posts/user/${isOwnProfile && currentUser ? currentUser.id : userId}`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+  });
+
+  const { data: userDegrees = [], isLoading: degreesLoading } = useQuery({
+    queryKey: ['/api/users', userId, 'degrees'],
+    enabled: !!userId,
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${userId}/degrees`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+  });
+
+  const { data: userCertificates = [], isLoading: certificatesLoading } = useQuery({
+    queryKey: ['/api/users', userId, 'certificates'],
+    enabled: !!userId,
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${userId}/certificates`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+  });
+
+  const { data: userGallery = [], isLoading: galleryLoading } = useQuery({
+    queryKey: ['/api/users', userId, 'gallery'],
+    enabled: !!userId,
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${userId}/gallery`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
+  });
+
+  const { data: userDrafts = [], isLoading: draftsLoading } = useQuery({
     queryKey: ['/api/users/me/drafts'],
     enabled: isOwnProfile && isAuthenticated,
+    queryFn: async () => {
+      const res = await fetch(`/api/users/me/drafts`);
+      if (!res.ok) return [];
+      return await res.json();
+    },
   });
 
   if (userLoading) {
@@ -310,7 +347,7 @@ export default function Profile() {
                       {FORUM_SECTIONS.map(section => (
                         <Link key={section.id} href={`/forum/${section.id}`}>
                           <Button variant="outline" className="w-full">
-                            {section.name}
+                            {section.label}
                           </Button>
                         </Link>
                       ))}
