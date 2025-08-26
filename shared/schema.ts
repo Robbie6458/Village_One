@@ -1,10 +1,14 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, integer, jsonb } from "drizzle-orm/pg-core";
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().notNull(),
   displayName: text("display_name"),
   avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  archetype: text("archetype"),
+  level: integer("level").default(1),
+  bio: text("bio").default(""),
+  socialLinks: jsonb("social_links").default({}),
 });
 
 export const posts = pgTable("posts", {
