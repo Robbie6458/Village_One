@@ -1,0 +1,13 @@
+{
+  "name": "village-one-api",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.56.0",
+    "@vercel/node": "^3.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.11",
+    "typescript": "^5.3.3"
+  }
+}
