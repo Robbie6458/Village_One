@@ -1,10 +1,9 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist", 
-  "devCommand": "npm run dev",
-  "installCommand": "npm ci",
+  "buildCommand": "cd client && npm run build",
+  "outputDirectory": "client/dist", 
+  "devCommand": "cd client && npm run dev",
+  "installCommand": "cd client && npm ci",
   "framework": null,
-  "rootDirectory": "client",
   "functions": {
     "api/posts.ts": {
       "maxDuration": 30
