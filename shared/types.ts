@@ -9,6 +9,15 @@ export interface Profile {
   displayName: string | null;
   avatarUrl: string | null;
   createdAt: string;         // ISO timestamp
+  archetype?: string | null;
+  level?: number;
+  bio?: string;
+  socialLinks?: {
+    instagram?: string;
+    facebook?: string;
+    x?: string;
+    [key: string]: string | undefined;
+  };
 }
 
 /** posts table */
