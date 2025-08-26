@@ -1,37 +1,77 @@
 /**
- * Direct Supabase integration for profile management.
- * This module provides functions for fetching, updating, and managing user profiles
- * directly through the Supabase client, ensuring consistent data access patterns.
+ * Profile management API
+ * Centralized module for all profile-related operations using Supabase.
+ * Handles data mapping between frontend and database representations.
  */
 
 import { supabase } from "@/lib/supabaseClient";
 import type { Profile } from "@shared/types";
+
+// Type for database profile fields (snake_case)
+type DbProfile = {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  archetype: string | null;
+  level: number;
+  bio: string;
+  social_links: Record<string, string>;
+};
+
+/**
+ * Maps a database profile to frontend format
+ */
+function mapDbToProfile(dbProfile: DbProfile): Profile {
+  return {
+    id: dbProfile.id,
+    displayName: dbProfile.display_name,
+    avatarUrl: dbProfile.avatar_url,
+    createdAt: dbProfile.created_at,
+    archetype: dbProfile.archetype,
+    level: dbProfile.level,
+    bio: dbProfile.bio,
+    socialLinks: dbProfile.social_links
+  };
+}
+
+/**
+ * Maps frontend profile updates to database format
+ */
+function mapProfileToDb(profile: Partial<Profile>): Partial<DbProfile> {
+  return {
+    display_name: profile.displayName,
+    avatar_url: profile.avatarUrl,
+    archetype: profile.archetype,
+    level: profile.level,
+    bio: profile.bio,
+    social_links: profile.socialLinks
+  };
+}
 
 /**
  * Fetches all community profiles with their associated stats.
  * Combines profile information with post and comment counts from the materialized view.
  * @returns Promise<Array<Profile & { stats: { post_count: number, comment_count: number } }>>
  */
+/**
+ * Fetches all community profiles with their stats
+ */
 export async function fetchCommunityProfiles() {
   try {
-    // First get all profiles
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('*');
+    // Get profiles and stats in parallel
+    const [profilesResponse, statsResponse] = await Promise.all([
+      supabase.from('profiles').select('*'),
+      supabase.from('profile_stats').select('*')
+    ]);
 
-    if (profilesError) throw profilesError;
+    if (profilesResponse.error) throw profilesResponse.error;
+    if (statsResponse.error) throw statsResponse.error;
 
-    // Then get all profile stats from the materialized view
-    const { data: stats, error: statsError } = await supabase
-      .from('profile_stats')
-      .select('*');
-
-    if (statsError) throw statsError;
-
-    // Combine profiles with their stats, providing defaults for missing data
-    return profiles.map(profile => ({
-      ...profile,
-      stats: stats?.find(s => s.id === profile.id) || {
+    // Combine and map the data
+    return profilesResponse.data.map(profile => ({
+      ...mapDbToProfile(profile),
+      stats: statsResponse.data?.find(s => s.id === profile.id) || {
         post_count: 0,
         comment_count: 0
       }
@@ -43,9 +83,7 @@ export async function fetchCommunityProfiles() {
 }
 
 /**
- * Fetches a single user profile by ID.
- * @param userId - The UUID of the user whose profile to fetch
- * @returns Promise<Profile>
+ * Fetches a single user profile by ID
  */
 export async function getProfile(userId: string) {
   try {
@@ -56,7 +94,9 @@ export async function getProfile(userId: string) {
       .single();
 
     if (error) throw error;
-    return data;
+    if (!data) throw new Error('Profile not found');
+
+    return mapDbToProfile(data);
   } catch (error) {
     console.error('Error fetching profile:', error);
     throw error;
@@ -64,33 +104,106 @@ export async function getProfile(userId: string) {
 }
 
 /**
- * Updates a user's profile information.
- * Handles the conversion between frontend camelCase and database snake_case fields.
- * @param userId - The UUID of the user whose profile to update
- * @param updates - Object containing the fields to update (using frontend field names)
- * @returns Promise<Profile>
+ * Updates a user's profile information
  */
 export async function updateProfile(userId: string, updates: Partial<Profile>) {
   try {
-    // Map frontend field names to database column names
+    const dbUpdates = mapProfileToDb(updates);
     const { data, error } = await supabase
       .from('profiles')
-      .update({
-        display_name: updates.displayName,
-        avatar_url: updates.avatarUrl,
-        bio: updates.bio,
-        level: updates.level,
-        archetype: updates.archetype,
-        social_links: updates.socialLinks
-      })
+      .update(dbUpdates)
       .eq('id', userId)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    if (!data) throw new Error('Profile not found');
+
+    return mapDbToProfile(data);
   } catch (error) {
     console.error('Error updating profile:', error);
+    throw error;
+  }
+}
+
+/**
+ * Checks if a user has a profile
+ */
+export async function hasProfile(userId: string): Promise<boolean> {
+  try {
+    const { count, error } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('id', userId);
+
+    if (error) throw error;
+    return count === 1;
+  } catch (error) {
+    console.error('Error checking profile:', error);
+    throw error;
+  }
+}
+
+/**
+ * Search for profiles matching a query string
+ */
+export async function searchProfiles(query: string) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .or(`display_name.ilike.%${query}%,bio.ilike.%${query}%`)
+      .limit(20);
+
+    if (error) throw error;
+    return data.map(mapDbToProfile);
+  } catch (error) {
+    console.error('Error searching profiles:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get profiles by archetype
+ */
+export async function getProfilesByArchetype(archetype: string) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('archetype', archetype);
+
+    if (error) throw error;
+    return data.map(mapDbToProfile);
+  } catch (error) {
+    console.error('Error fetching profiles by archetype:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all archetypes with their user counts
+ */
+export async function getArchetypeCounts() {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('archetype')
+      .not('archetype', 'is', null);
+
+    if (error) throw error;
+
+    // Count occurrences of each archetype
+    const counts = data.reduce((acc, { archetype }) => {
+      if (archetype) {
+        acc[archetype] = (acc[archetype] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    return counts;
+  } catch (error) {
+    console.error('Error getting archetype counts:', error);
     throw error;
   }
 }
