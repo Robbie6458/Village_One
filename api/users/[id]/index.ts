@@ -23,6 +23,8 @@ export default async function handler(req: any, res: any) {
     const rawId = Array.isArray(id) ? id[0] : id;
 
     let userId = rawId;
+    let authUser = null;
+    
     if (rawId === 'me') {
       const authHeader = req.headers?.authorization;
       const token = authHeader?.startsWith('Bearer ')
@@ -38,6 +40,7 @@ export default async function handler(req: any, res: any) {
       }
 
       userId = userData.user.id;
+      authUser = userData.user;
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -54,7 +57,23 @@ export default async function handler(req: any, res: any) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    return res.status(200).json(profile);
+    // Map database fields to frontend expected fields
+    const mappedProfile = {
+      id: profile.id,
+      username: profile.display_name || '',
+      displayName: profile.display_name || '',
+      email: authUser?.email || '', // Get email from auth user for 'me' endpoint
+      bio: profile.bio || '',
+      archetype: profile.archetype || null,
+      level: profile.level || 1,
+      avatarUrl: profile.avatar_url || '',
+      profileImageUrl: profile.avatar_url || '',
+      socialLinks: profile.social_links || {},
+      createdAt: profile.created_at,
+      contributions: 0 // TODO: calculate from posts/comments
+    };
+
+    return res.status(200).json(mappedProfile);
   }
 
   if (req.method === 'PATCH') {
